@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="测字问心 · ZiOracle — 输入一字，拆字解字、五行分析、吉凶解读，可结合八字命盘联动。免费在线，中英双语，单文件即用。">
+<meta name="keywords" content="测字,拆字,解字,五行,命理,在线测字,免费,中文,汉字">
+<meta property="og:title" content="测字问心 · ZiOracle">
+<meta property="og:description" content="一字一世界 · 拆字解字 · 五行命理 · 中英双语">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0d0d1a">
+<title>测字问心 · ZiOracle</title>
+<style>
+:root{--bg:#0d0d1a;--card:#13132b;--bdr:#1e3799;--accent:#4a69bd;--gold:#ffd700;--text:#c8d6e5;--dim:#7f8fa6;--m:#4CAF50;--f:#F44336;--e:#FF9800;--inp:#0c0c22;--inpText:#f1f2f6;--mutedBdr:#2a2a4a;--foot:#576574;--grid:rgba(30,55,153,0.06);--inset:rgba(0,0,0,0.3)}
+html[data-theme="light"]{--bg:#f2e6cd;--card:#faf0dc;--bdr:#b8914f;--accent:#8a6a35;--gold:#7a5c1e;--text:#3e2f1d;--dim:#7d6a4d;--inp:#f7ecd6;--inpText:#3e2f1d;--mutedBdr:#d8c39a;--foot:#a08a63;--grid:rgba(138,106,53,0.08);--inset:rgba(90,60,30,0.05)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Courier New','Microsoft YaHei',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 12px 40px;background-image:repeating-linear-gradient(0deg,transparent,transparent 31px,var(--grid) 31px,var(--grid) 32px),repeating-linear-gradient(90deg,transparent,transparent 31px,var(--grid) 31px,var(--grid) 32px)}
+.hdr{text-align:center;margin:12px 0 16px}
+.hdr h1{font-size:24px;color:var(--gold);letter-spacing:5px;text-shadow:0 0 24px rgba(255,215,0,0.25)}
+.hdr .sub{color:var(--dim);font-size:12px;margin-top:3px;letter-spacing:2px}
+.menu-bar{display:flex;justify-content:center;gap:16px;margin:0 0 12px;flex-wrap:wrap;align-items:center}
+.menu-bar a{color:var(--dim);font-size:13px;cursor:pointer;letter-spacing:2px;text-decoration:none;border-bottom:1px solid transparent;transition:all 0.2s}
+.menu-bar a:hover{color:var(--gold);border-color:var(--accent)}
+.card{background:var(--card);border:3px solid var(--bdr);padding:20px 24px 24px;max-width:560px;width:100%;position:relative;box-shadow:0 0 40px rgba(74,105,189,0.2),inset 0 0 60px var(--inset);margin-bottom:16px}
+.card::before{content:'';position:absolute;top:-3px;left:-3px;right:-3px;bottom:-3px;border:1px solid var(--accent);pointer-events:none}
+.card::after{content:'';position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:1px solid rgba(74,105,189,0.2);pointer-events:none}
+input,select{width:100%;padding:10px 12px;background:var(--inp);color:var(--inpText);border:2px solid var(--bdr);font-size:14px;font-family:inherit;outline:none;resize:none;transition:border-color 0.2s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(74,105,189,0.3)}
+.btn{width:100%;padding:13px;margin-top:10px;background:linear-gradient(180deg,#2c3e80,#1e2d6a);color:var(--gold);border:2px solid var(--accent);font-size:15px;font-family:inherit;cursor:pointer;letter-spacing:3px;transition:all 0.15s;text-shadow:0 0 8px rgba(255,215,0,0.3)}
+.btn:hover{background:linear-gradient(180deg,#3b50a0,#253d8a);border-color:var(--gold)}.btn:active{transform:scale(0.97)}
+.btn.sm{font-size:12px;padding:9px;letter-spacing:1px}
+.btn.muted{background:var(--inp);color:var(--dim);border-color:var(--mutedBdr)}.btn.muted:hover{color:var(--text);border-color:var(--accent)}
+.lbl{font-size:12px;color:var(--dim);letter-spacing:1px;margin:10px 0 4px}
+.bigchar{font-size:80px;text-align:center;color:var(--gold);line-height:1;margin:10px 0;text-shadow:0 0 30px rgba(255,215,0,0.3)}
+.section{font-size:13px;color:var(--gold);letter-spacing:2px;margin:16px 0 6px;border-bottom:1px solid var(--bdr);padding-bottom:4px}
+.detail-panel .vernacular{font-size:15px;color:var(--text);line-height:1.9;margin:8px 0;padding:0 4px}
+.detail-panel .english{font-size:14px;color:var(--dim);font-style:italic;line-height:1.8;margin:8px 0;padding:0 4px;border-left:2px solid var(--accent);padding-left:10px}
+.elem-badge{display:inline-block;padding:4px 14px;border:1px solid var(--bdr);font-size:13px;letter-spacing:1px;margin:4px 6px 4px 0}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--card);color:var(--gold);padding:10px 24px;border:1px solid var(--accent);font-size:12px;letter-spacing:1px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--card);border:2px solid var(--bdr);padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;position:relative;font-size:14px;line-height:1.8;color:var(--text)}
+.modal-box h2{color:var(--gold);font-size:18px;letter-spacing:3px;margin-bottom:8px}
+.modal-box p,.modal-box li{font-size:14px;line-height:1.9;margin:4px 0}
+.modal-close{position:absolute;top:10px;right:16px;color:var(--dim);font-size:22px;cursor:pointer;background:none;border:none;font-family:inherit}
+.foot{margin-top:24px;color:var(--foot);font-size:12px;text-align:center}.foot a{color:var(--accent);text-decoration:none}
+@media(max-width:480px){.card{padding:14px 16px 18px}.hdr h1{font-size:20px}.bigchar{font-size:64px}}
+</style>
+<script>document.documentElement.setAttribute('data-theme',(function(){try{return localStorage.getItem('ceziTheme')||'light'}catch(e){return'light'}})());</script>
+</head>
+<body>
+
+<div class="hdr">
+<h1>测字问心 · ZiOracle</h1>
+<div class="sub">一字一世界 · One Character, One World · 拆字解字 · 五行命理</div>
+</div>
+
+<div class="menu-bar">
+<a onclick="openM('guide')">📖 <span id="tGuide">使用说明</span></a>
+<a onclick="openM('disclaim')">⚠️ <span id="tDisclaim">免责声明</span></a>
+<a onclick="openM('about')">ℹ️ <span id="tAbout">关于</span></a>
+<span style="color:var(--bdr)">|</span>
+<a id="btnZh" class="active" onclick="setL('zh')">中</a>
+<a id="btnEn" onclick="setL('en')">EN</a>
+<a id="btnTheme" onclick="toggleTheme()" style="font-size:13px">🌙</a>
+</div>
+
+<div class="card" id="inputPage">
+<div id="dailyCard" style="margin-bottom:10px;padding:10px 14px;background:var(--card);border:1px solid var(--gold);cursor:pointer" onclick="useDailyChar()"></div>
+<div class="lbl" id="lblChar">✍️ 输入一个字（或随机抽字）</div>
+<div style="display:flex;gap:8px;align-items:stretch">
+<input type="text" id="charInput" maxlength="2" placeholder="如：安、福、缘、路..." style="font-size:20px;text-align:center;flex:1">
+<button class="btn muted sm" onclick="randomChar()" style="width:auto;padding:0 14px;margin-top:0;white-space:nowrap" id="btnRandChar">🎲 随机</button>
+</div>
+<div class="lbl" id="lblQuestion">💭 你想问什么？（👇 点击下方标签直接选择，或自行输入）</div>
+<div id="qChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+<input type="text" id="question" placeholder="如：事业、感情、运势...">
+<div class="lbl" id="lblBazi">⚔ 加入八字合参（选填 · 填则需填全）</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<input type="number" id="by" placeholder="年" min="1900" max="2100" style="flex:1;min-width:70px">
+<input type="number" id="bm" placeholder="月" min="1" max="12" style="flex:1;min-width:55px">
+<input type="number" id="bd" placeholder="日" min="1" max="31" style="flex:1;min-width:55px">
+<select id="bh" style="flex:1.4;min-width:110px">
+<option value="">时辰（选）</option>
+<option value="0">子时 23-1</option><option value="1">丑时 1-3</option><option value="2">寅时 3-5</option><option value="3">卯时 5-7</option><option value="4">辰时 7-9</option><option value="5">巳时 9-11</option><option value="6">午时 11-13</option><option value="7">未时 13-15</option><option value="8">申时 15-17</option><option value="9">酉时 17-19</option><option value="10">戌时 19-21</option><option value="11">亥时 21-23</option>
+</select>
+</div>
+<button class="btn" onclick="doDivine()" id="btnDivine">🔮 测字</button>
+<button class="btn muted sm" onclick="quickDivine()" id="btnQuick">🎲 一键随机测字</button>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn muted sm" onclick="showFavList()" style="flex:1">⭐ <span id="btnFav">收藏夹</span> <span id="favCount">0</span></button>
+<button class="btn muted sm" onclick="showHistList()" style="flex:1">🕘 <span id="btnHist">历史</span></button>
+</div>
+<div id="favHistList" style="margin-top:8px;max-height:40vh;overflow-y:auto"></div>
+<div style="font-size:11px;color:var(--dim);text-align:center;margin-top:8px" id="remark">心诚则灵 · 一字一问 · 仅供文化参考</div>
+</div>
+
+<div class="card" id="resultPage" style="display:none">
+<div id="detailBack" style="cursor:pointer;color:var(--accent);font-size:13px;margin-bottom:10px;display:inline-block" onclick="backToInput()">◀ <span id="lblBack">返回重测</span></div>
+<div class="bigchar" id="bigChar">安</div>
+<div class="detail-panel" id="detailContent"></div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn muted sm" onclick="toggleFavChar()" style="flex:1">⭐ <span id="btnToggleFav">收藏</span></button>
+<button class="btn muted sm" onclick="copyCard()" style="flex:1">📋 <span id="btnCopy">复制</span></button>
+<button class="btn muted sm" onclick="downloadCard()" style="flex:1">🖼️ <span id="btnDl">下载图</span></button>
+</div>
+</div>
+
+<div class="foot" id="footText">© 测字问心 · 永远的兰兰 · 参考传统测字文化 · 仅供文化参考</div>
+<div class="foot" style="margin-top:4px">🧰 系列工具 · <a href="https://podcatcher962.github.io/PixelBaZi/" target="_blank" rel="noopener">⚔ 像素命盘</a> · <a href="https://podcatcher962.github.io/IChing/" target="_blank" rel="noopener">🪙 六爻起卦</a> · <a href="https://podcatcher962.github.io/YuguTether/" target="_blank" rel="noopener">📜 与古为徒</a></div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeM()"><div class="modal-box" id="modalBox"></div></div>
+<canvas id="cv" style="display:none" width="500" height="700"></canvas>
+<script src="lunar.min.js"></script>
+<script>
+let lang='zh';
+
+// ========== 五行部首库 ==========
+const ELEM={
+  '金':{en:'Metal',chars:'金银铜铁锡钊钦铉铭锐锋',desc:'坚毅果断，重承诺，有原则',enDesc:'Firm, decisive, principled'},
+  '木':{en:'Wood',chars:'林森树松柏杨柳桂桃李梅杏',desc:'向上生长，温和包容，有生机',enDesc:'Growing, gentle, full of life'},
+  '水':{en:'Water',chars:'江河湖海洋泉溪流波涛汉沈',desc:'灵活变通，智慧深邃，善适应',enDesc:'Flexible, wise, adaptable'},
+  '火':{en:'Fire',chars:'炎焰灯灿烂煌炳炬烽燮',desc:'热情奔放，行动力强，有感染力',enDesc:'Passionate, energetic, contagious'},
+  '土':{en:'Earth',chars:'地坤城垣基培境址坚',desc:'稳重踏实，可靠可信，能承载',enDesc:'Steady, reliable, grounded'}
+};
+
+// ========== 部首五行映射（覆盖200+部首，让所有常用字准确判五行） ==========
+const RADICAL_ELEM={
+  // 金（0）
+  '钅':0,'金':0,'刂':0,'刀':0,'戈':0,'刃':0,'剑':0,'矛':0,'矢':0,'斤':0,'辛':0,'酉':0,'庚':0,'申':0,'兑':0,'肃':0,
+  // 木（1）
+  '木':1,'林':1,'艹':1,'禾':1,'竹':1,'⺮':1,'森':1,'杉':1,'柳':1,'杨':1,'桂':1,'柏':1,'松':1,'梅':1,'杏':1,'草':1,'艸':1,'乙':1,'寅':1,'卯':1,'东':1,'青':1,'生':1,
+  // 水（2）
+  '氵':2,'水':2,'冫':2,'雨':2,'川':2,'冰':2,'雪':2,'霜':2,'露':2,'云':2,'泉':2,'江':2,'河':2,'湖':2,'海':2,'波':2,'浪':2,'流':2,'泪':2,'汁':2,'亥':2,'子':2,'北':2,'黑':2,'鱼':2,
+  // 火（3）
+  '火':3,'灬':3,'日':3,'光':3,'炎':3,'焰':3,'灯':3,'灿':3,'烂':3,'煌':3,'炬':3,'炳':3,'烽':3,'热':3,'煮':3,'烈':3,'照':3,'然':3,'焦':3,'红':3,'赤':3,'丹':3,'丙':3,'丁':3,'巳':3,'午':3,'南':3,
+  // 土（4）
+  '土':4,'山':4,'石':4,'田':4,'王':4,'玉':4,'地':4,'坤':4,'城':4,'垣':4,'基':4,'培':4,'境':4,'址':4,'坚':4,'坤':4,'尘':4,'泥':4,'堆':4,'堤':4,'壁':4,'崖':4,'岩':4,'砂':4,'砖':4,'戊':4,'己':4,'丑':4,'辰':4,'未':4,'戌':4,'中':4
+};
+
+// ========== 常见汉字测字库 ==========
+const CEZI={
+  '安':{elem:4,radical:'宀',structure:'上下结构（宀+女）',zh:'宝盖头是家，女是家人。家中有女，安宁祥和。测"安"字，主安稳顺遂，家庭和睦，宜守成不宜冒进。',en:'The roof (宀) is home, the woman (女) is family. A woman in the home brings peace. "An" (peace) signals stability and harmony—better to consolidate than to venture.',tip:'求稳则吉，家和万事兴',enTip:'Seek stability; harmony prospers'},
+  '福':{elem:4,radical:'礻',structure:'左右结构（礻+畐）',zh:'示字旁是祭祀，畐是满腹。福是上天赐予的丰足。测"福"字，主福气临门，所求之事多有善果。',en:'The altar (礻) plus abundance (畐). Fortune is heaven-granted fullness. "Fu" (fortune) signals blessings approaching—your pursuit will bear good fruit.',tip:'福气临门，善果将至',enTip:'Fortune approaches; good fruit awaits'},
+  '缘':{elem:1,radical:'纟',structure:'左右结构（纟+彖）',zh:'丝旁是缠绕，彖是缘由。缘分如丝，可遇不可求。测"缘"字，主缘分将至，感情或人际有新机。',en:'The silk (纟) winds, the base speaks of cause. Fate is like silk—it comes when it comes. "Yuan" (fate) signals new bonds in love or friendship.',tip:'缘分将至，静待佳音',enTip:'Fate approaches; await good news'},
+  '路':{elem:2,radical:'足',structure:'左右结构（足+各）',zh:'足是行走，各是各人。路在脚下，各人各走。测"路"字，主前程在自己脚下，宜主动开拓。',en:'The foot (足) walks, each (各) goes their way. The road is under your feet. "Lu" (road) signals your future is yours to forge—take initiative.',tip:'路在脚下，主动开拓',enTip:'The road is yours; take initiative'},
+  '财':{elem:0,radical:'贝',structure:'左右结构（贝+才）',zh:'贝是钱币，才是才能。以才生财，财才相生。测"财"字，主财靠才能，有才自有财。',en:'The shell (贝) is money, the talent (才) is ability. Wealth grows from talent. "Cai" (wealth) signals money follows ability.',tip:'以才生财，有才自有财',enTip:'Wealth follows talent'},
+  '梦':{elem:1,radical:'木',structure:'上下结构（林+夕）',zh:'双木是林，夕是夜。梦在夜里生，虚幻难捉。测"梦"字，主理想需落地，空想无益。',en:'Twin trees (林) and night (夕). Dreams are born at night, elusive. "Meng" (dream) signals ideals must be grounded—idle fancy helps nothing.',tip:'理想需落地，空想无益',enTip:'Ground your dreams; idle fancy helps nothing'},
+  '静':{elem:2,radical:'青',structure:'左右结构（青+争）',zh:'青是纯净，争是纷扰。静是于纷扰中守住纯净。测"静"字，主宜静不宜动，以静制动。',en:'Purity (青) meets strife (争). Stillness is keeping pure amid chaos. "Jing" (stillness) signals stillness over motion—win by patience.',tip:'以静制动，守住本心',enTip:'Win by stillness; keep your heart'},
+  '思':{elem:4,radical:'田',structure:'上下结构（田+心）',zh:'田上是心。思是心在耕耘。测"思"字，主多思多虑，宜果断，想太多反误事。',en:'The heart above the field. Thought is the heart tilling. "Si" (think) signals overthinking—be decisive, too much thought backfires.',tip:'想太多误事，宜果断',enTip:'Overthinking backfires; be decisive'},
+  '勇':{elem:3,radical:'力',structure:'上下结构（甬+力）',zh:'甬上有力。勇是心中有力量。测"勇"字，主敢作敢为，勇往直前必有成。',en:'Strength over the base. Courage is power in the heart. "Yong" (courage) signals bold action—advance and you will succeed.',tip:'勇往直前，敢作敢为',enTip:'Advance boldly; act with courage'},
+  '富':{elem:4,radical:'宀',structure:'上下结构（宀+畐）',zh:'宝盖是家，畐是满。家有满仓即富。测"富"字，主财富渐丰，宜守财理财。',en:'The roof (宀) and fullness (畐). A full house is wealth. "Fu" (wealth) signals growing fortune—manage it well.',tip:'财富渐丰，宜守财',enTip:'Fortune grows; manage it well'},
+  '乐':{elem:1,radical:'丿',structure:'独体字',zh:'乐字本是乐器，引申为快乐。测"乐"字，主心境开朗，快乐自寻。',en:'"Le" originally a musical instrument, extended to joy. It signals an open heart—joy is self-found.',tip:'快乐自寻，心境开朗',enTip:'Joy is self-found; open your heart'},
+  '和':{elem:1,radical:'口',structure:'左右结构（禾+口）',zh:'禾是庄稼，口是言语。有粮有言，和也。测"和"字，主人际和谐，家和万事兴。',en:'Grain (禾) and speech (口). With food and words comes harmony. "He" signals harmonious relations—a harmonious family prospers.',tip:'人际和谐，家和万事兴',enTip:'Harmony in relations; family prospers'},
+  '成':{elem:0,radical:'戈',structure:'独体字',zh:'成字含戈，成事需拼。测"成"字，主事在人为，坚持终成。',en:'"Cheng" contains a spear—achievement needs struggle. It signals success through persistence.',tip:'事在人为，坚持终成',enTip:'Success through persistence'},
+  '望':{elem:2,radical:'月',structure:'上下结构（亡+月+王）',zh:'望是眺望远方。测"望"字，主有盼头，目标在前，坚持可及。',en:'"Wang" means gazing afar. It signals hope ahead—your goal is reachable with persistence.',tip:'有盼头，目标在前',enTip:'Hope ahead; the goal is reachable'},
+  '平':{elem:4,radical:'干',structure:'独体字',zh:'平是平坦均等。测"平"字，主平稳安康，无大起大落。',en:'"Ping" means level and equal. It signals a calm, steady path without great upheavals.',tip:'平稳安康，无大起大落',enTip:'Calm and steady; no great upheavals'},
+  '顺':{elem:2,radical:'川',structure:'左右结构（川+页）',zh:'川是流水，顺是顺势。测"顺"字，主顺势而为，诸事顺遂。',en:'The river (川) flows; "Shun" means going with the flow. It signals smooth sailing by following the current.',tip:'顺势而为，诸事顺遂',enTip:'Go with the flow; all goes smoothly'},
+  '好':{elem:2,radical:'女',structure:'左右结构（女+子）',zh:'女和子，美好。测"好"字，主好事将近，感情事业双丰收。',en:'Woman and child—goodness. "Hao" signals good things approaching, in both love and career.',tip:'好事将近，双丰收',enTip:'Good things approach; double harvest'},
+  '康':{elem:4,radical:'广',structure:'半包围结构（广+隶）',zh:'广是宽广，隶是隶属。康是身心安康。测"康"字，主健康安泰，身心舒畅。',en:'"Kang" signals health and well-being—body and mind at ease.',tip:'健康安泰，身心舒畅',enTip:'Health and ease of body and mind'},
+  '鑫':{elem:0,radical:'金',structure:'品字结构（三金）',zh:'三金相叠，财源滚滚。测"鑫"字，主财运亨通，富贵盈门。',en:'Three golds stacked—wealth flowing. "Xin" signals flourishing fortune and prosperity.',tip:'财运亨通，富贵盈门',enTip:'Fortune flourishes; prosperity arrives'},
+  '龙':{elem:2,radical:'龙',structure:'独体字',zh:'龙是祥瑞神物。测"龙"字，主大有可为，飞龙在天。',en:'The dragon is an auspicious deity. "Long" signals great potential—the flying dragon in heaven.',tip:'大有可为，飞龙在天',enTip:'Great potential; the dragon flies'},
+
+  '爱':{elem:4,radical:'心',structure:'上下结构（爫+冖+友）',zh:'爱字有心，心在友上。爱是心与友的交融。测"爱"字，主感情深厚，宜真诚付出。',en:'Love has a heart over friendship. "Ai" signals deep affection—give sincerely.',tip:'真诚付出，爱有回响',enTip:'Give sincerely; love echoes'},
+  '信':{elem:0,radical:'亻',structure:'左右结构（亻+言）',zh:'人言为信。说话算数就是信。测"信"字，主诚信立身，诺言千金。',en:'A person\u2019s word is trust. "Xin" signals integrity—your word is your bond.',tip:'诚信立身，诺言千金',enTip:'Integrity builds; your word is gold'},
+  '义':{elem:0,radical:'丶',structure:'独体字',zh:'义是合宜正当。测"义"字，主行事合乎道义，坦荡无愧。',en:'"Yi" means what is right. It signals righteous conduct and a clear conscience.',tip:'行事合义，坦荡无愧',enTip:'Act righteously; a clear conscience'},
+  '德':{elem:4,radical:'彳',structure:'左右结构（彳+十+四+心）',zh:'德字含心，德行在心。测"德"字，主以德服人，厚德载物。',en:'"De" contains a heart—virtue lives within. It signals winning through virtue.',tip:'厚德载物，以德服人',enTip:'Great virtue carries all; win through character'},
+  '善':{elem:3,radical:'口',structure:'上下结构（羊+口）',zh:'羊是温顺，口是言语。善是温言善行。测"善"字，主善有善报，积善成德。',en:'The gentle sheep and the mouth. "Shan" signals kindness—good deeds bring good returns.',tip:'善有善报，积善成德',enTip:'Kindness returns; accumulate good'},
+  '美':{elem:4,radical:'羊',structure:'上下结构（羊+大）',zh:'羊大则美。美是丰盛美好。测"美"字，主审美提升，生活丰美。',en:'A big sheep is beautiful. "Mei" signals beauty and abundance.',tip:'生活丰美，审美提升',enTip:'Abundant beauty; refined taste'},
+  '喜':{elem:3,radical:'口',structure:'上下结构（壴+口）',zh:'喜是鼓乐之喜。测"喜"字，主喜事临门，心情愉悦。',en:'"Xi" is the joy of drum and song. It signals happy events approaching.',tip:'喜事临门，心情愉悦',enTip:'Joy approaches; a glad heart'},
+  '幸':{elem:4,radical:'土',structure:'上下结构（土+羊）',zh:'幸是幸运幸福。测"幸"字，主幸运眷顾，否极泰来。',en:'"Xing" means fortune and bliss. It signals luck smiling on you.',tip:'幸运眷顾，否极泰来',enTip:'Luck smiles; the worst is over'},
+  '诚':{elem:0,radical:'讠',structure:'左右结构（讠+成）',zh:'言成则诚。说到做到是诚。测"诚"字，主诚心诚意，金石为开。',en:'Words fulfilled are sincerity. "Cheng" signals that honesty opens all doors.',tip:'诚心诚意，金石为开',enTip:'Sincerity opens even stone'},
+  '智':{elem:3,radical:'日',structure:'上下结构（知+日）',zh:'知日为智，日积月累的知。测"智"字，主智慧渐长，明辨是非。',en:'Knowledge accumulated daily becomes wisdom. "Zhi" signals growing insight.',tip:'智慧渐长，明辨是非',enTip:'Wisdom grows; discern clearly'},
+  '慧':{elem:3,radical:'心',structure:'上下结构（彗+心）',zh:'慧字有心，聪慧在心。测"慧"字，主心思清明，慧眼识珠。',en:'"Hui" has a heart—wisdom lives within. It signals clear discernment.',tip:'心思清明，慧眼识珠',enTip:'Clear mind; discerning eye'},
+  '友':{elem:4,radical:'又',structure:'独体字',zh:'友是志同道合。测"友"字，主良友相伴，情谊长存。',en:'"You" is like-minded companionship. It signals true friends staying.',tip:'良友相伴，情谊长存',enTip:'True friends stay; bonds endure'},
+  '情':{elem:2,radical:'忄',structure:'左右结构（忄+青）',zh:'心旁是情，青是纯净。情是纯净的心。测"情"字，主感情纯真，宜真心相待。',en:'The heart radical and purity. "Qing" signals sincere feeling—treat it truly.',tip:'感情纯真，真心相待',enTip:'Sincere feeling; treat it truly'},
+  '婚':{elem:3,radical:'女',structure:'左右结构（女+昏）',zh:'女旁是婚姻，昏是黄昏成礼。测"婚"字，主姻缘可期，良缘将至。',en:'"Hun" carries the bride radical—marriage at dusk. It signals a good match approaching.',tip:'姻缘可期，良缘将至',enTip:'A good match approaches'},
+  '运':{elem:2,radical:'辶',structure:'半包围结构（云+辶）',zh:'云是变幻，辶是行走。运是流动变化。测"运"字，主运势流转，时来运转。',en:'Clouds and walking—fortune flows and changes. "Yun" signals a turn of luck.',tip:'运势流转，时来运转',enTip:'Fortune turns; luck shifts'},
+  '势':{elem:3,radical:'力',structure:'上下结构（埶+力）',zh:'势是力量与趋势。测"势"字，主顺势而为，借势而上。',en:'"Shi" is force and trend. It signals riding the momentum upward.',tip:'顺势而为，借势而上',enTip:'Ride the momentum; rise with the trend'},
+  '学':{elem:1,radical:'子',structure:'上下结构（龸+子）',zh:'学字含子，教子学。测"学"字，主学业有成，学有所获。',en:'"Xue" contains the child—learning. It signals academic success.',tip:'学业有成，学有所获',enTip:'Academic success; real gains'},
+  '业':{elem:1,radical:'一',structure:'独体字',zh:'业是事业功业。测"业"字，主事业有成，步步高升。',en:'"Ye" is career and achievement. It signals rising success.',tip:'事业有成，步步高升',enTip:'Career success; rising step by step'},
+  '升':{elem:1,radical:'丿',structure:'独体字',zh:'升是上升高升。测"升"字，主运势上扬，步步高升。',en:'"Sheng" means rising. It signals an upward trend.',tip:'运势上扬，步步高升',enTip:'Rising fortune; step by step up'},
+  '寿':{elem:4,radical:'寸',structure:'半包围结构（士+工+口+寸）',zh:'寿是长寿安康。测"寿"字，主健康长寿，福寿绵长。',en:'"Shou" is longevity. It signals health and long life.',tip:'健康长寿，福寿绵长',enTip:'Long life; enduring blessings'},
+  '禄':{elem:4,radical:'礻',structure:'左右结构（礻+录）',zh:'禄是俸禄福气。测"禄"字，主官禄财运，禄位高升。',en:'"Lu" is salary and blessing. It signals rising wealth and rank.',tip:'官禄财运，禄位高升',enTip:'Rising rank and wealth'},
+  '权':{elem:1,radical:'木',structure:'左右结构（木+又）',zh:'木旁是权，权是力量。测"权"字，主掌握主动，有权有责。',en:'"Quan" is power and authority. It signals taking the initiative.',tip:'掌握主动，有权有责',enTip:'Take initiative; power with duty'},
+  '合':{elem:4,radical:'口',structure:'上下结构（人+一+口）',zh:'人一口，合也。测"合"字，主合作共赢，天作之合。',en:'One person, one mouth—unity. "He" signals win-win cooperation.',tip:'合作共赢，天作之合',enTip:'Win-win; a match made in heaven'},
+  '吉':{elem:4,radical:'口',structure:'上下结构（士+口）',zh:'士人之口，吉言。测"吉"字，主大吉大利，诸事顺遂。',en:'"Ji" is auspiciousness. It signals great fortune and smooth sailing.',tip:'大吉大利，诸事顺遂',enTip:'Great fortune; all goes well'},
+  '祥':{elem:4,radical:'礻',structure:'左右结构（礻+羊）',zh:'示旁是祭祀，羊是祥和。测"祥"字，主吉祥如意，祥瑞临门。',en:'Altar and sheep—auspicious. "Xiang" signals blessings arriving.',tip:'吉祥如意，祥瑞临门',enTip:'Blessings arrive; all is auspicious'},
+  '兴':{elem:3,radical:'八',structure:'上下结构（八+一+八）',zh:'兴是兴旺兴盛。测"兴"字，主事业兴旺，家业昌盛。',en:'"Xing" means thriving. It signals flourishing career and family.',tip:'事业兴旺，家业昌盛',enTip:'Flourishing career and family'},
+  '旺':{elem:3,radical:'日',structure:'左右结构（日+王）',zh:'日旺为王。测"旺"字，主运势旺盛，红红火火。',en:'Sun and king—thriving. "Wang" signals peak fortune.',tip:'运势旺盛，红红火火',enTip:'Peak fortune; blazing success'},
+  '丰':{elem:1,radical:'丨',structure:'独体字',zh:'丰是丰收丰盛。测"丰"字，主收获丰厚，硕果累累。',en:'"Feng" is abundance. It signals a rich harvest.',tip:'收获丰厚，硕果累累',enTip:'Rich harvest; abundant fruit'},
+  '盛':{elem:0,radical:'皿',structure:'上下结构（成+皿）',zh:'盛是盛大昌盛。测"盛"字，主事业鼎盛，如日中天。',en:'"Sheng" is flourishing. It signals your career at its peak.',tip:'事业鼎盛，如日中天',enTip:'Career at its peak; blazing sun'},
+  '发':{elem:2,radical:'又',structure:'半包围结构',zh:'发是发展发达。测"发"字，主厚积薄发，一鸣惊人。',en:'"Fa" is development. It signals a burst after long accumulation.',tip:'厚积薄发，一鸣惊人',enTip:'Burst after accumulation; amaze all'},
+  '进':{elem:2,radical:'辶',structure:'半包围结构（井+辶）',zh:'进是前进进取。测"进"字，主积极进取，更进一步。',en:'"Jin" is advancing. It signals positive progress.',tip:'积极进取，更进一步',enTip:'Advance positively; go further'},
+  '退':{elem:2,radical:'辶',structure:'半包围结构（艮+辶）',zh:'退是退让后退。测"退"字，主以退为进，退一步海阔天空。',en:'"Tui" is retreat. It signals that stepping back opens space.',tip:'以退为进，退一步海阔天空',enTip:'Retreat to advance; step back for space'},
+  '稳':{elem:1,radical:'禾',structure:'左右结构（禾+急）',zh:'禾是庄稼，稳是安稳。测"稳"字，主稳扎稳打，稳妥为上。',en:'Grain and steadiness. "Wen" signals solid, steady progress.',tip:'稳扎稳打，稳妥为上',enTip:'Solid and steady; stability first'},
+  '快':{elem:2,radical:'忄',structure:'左右结构（忄+夬）',zh:'快是快速快乐。测"快"字，主行动迅速，快乐相伴。',en:'"Kuai" is speed and joy. It signals quick action with happiness.',tip:'行动迅速，快乐相伴',enTip:'Act quickly; joy accompanies'},
+  '慢':{elem:2,radical:'忄',structure:'左右结构（忄+曼）',zh:'慢是缓慢从容。测"慢"字，主慢工出细活，从容不迫。',en:'"Man" is slowness and ease. It signals patience yields fine work.',tip:'慢工出细活，从容不迫',enTip:'Patience yields fine work; stay composed'},
+  '止':{elem:4,radical:'止',structure:'独体字',zh:'止是停止知止。测"止"字，主知止不殆，适可而止。',en:'"Zhi" is stopping. It signals knowing when to stop.',tip:'知止不殆，适可而止',enTip:'Know when to stop; avoid danger'},
+  '得':{elem:1,radical:'彳',structure:'左右结构（彳+旦+寸）',zh:'得是获得得到。测"得"字，主得偿所愿，有所收获。',en:'"De" is obtaining. It signals wishes fulfilled.',tip:'得偿所愿，有所收获',enTip:'Wishes fulfilled; real gains'},
+  '失':{elem:0,radical:'丿',structure:'独体字',zh:'失是失去失意。测"失"字，主有失有得，塞翁失马。',en:'"Shi" is loss. It signals loss may hide gain.',tip:'有失有得，塞翁失马',enTip:'Loss hides gain; a blessing in disguise'},
+  '舍':{elem:2,radical:'人',structure:'上下结构（人+舌）',zh:'舍是舍弃舍得。测"舍"字，主有舍才有得。',en:'"She" is letting go. It signals that giving up brings gain.',tip:'有舍才有得',enTip:'Let go to gain'},
+  '圆':{elem:0,radical:'囗',structure:'全包围结构（囗+员）',zh:'圆是圆满团圆。测"圆"字，主圆满成功，阖家团圆。',en:'"Yuan" is completeness. It signals fulfillment and reunion.',tip:'圆满成功，阖家团圆',enTip:'Fulfillment; family reunion'},
+  '满':{elem:2,radical:'氵',structure:'左右结构（氵+㒼）',zh:'水旁是满，满则溢。测"满"字，主圆满但戒骄，满招损。',en:'Water full overflows. "Man" signals fulfillment—but guard against pride.',tip:'圆满戒骄，满招损',enTip:'Fulfillment—guard against pride'},
+  '谦':{elem:0,radical:'讠',structure:'左右结构（讠+兼）',zh:'言兼则谦。测"谦"字，主谦虚受益，谦谦君子。',en:'"Qian" is humility. It signals that modesty benefits.',tip:'谦虚受益，谦谦君子',enTip:'Modesty benefits; be the humble noble'},
+  '让':{elem:0,radical:'讠',structure:'左右结构（讠+上）',zh:'言上是让。测"让"字，主以让为先，退让得福。',en:'"Rang" is yielding. It signals that concession brings blessing.',tip:'以让为先，退让得福',enTip:'Yield first; concession brings blessing'},
+
+  '心':{elem:3,radical:'心',structure:'独体字',zh:'心是人之本。测"心"字，主心地纯正，心想事成。',en:'The heart is the root of a person. "Xin" signals a pure heart and wishes fulfilled.',tip:'心地纯正，心想事成',enTip:'A pure heart; wishes fulfilled'},
+  '天':{elem:3,radical:'大',structure:'独体字',zh:'天是广阔无垠。测"天"字，主天时地利，前途广阔。',en:'Heaven is boundless. "Tian" signals favorable timing and vast prospects.',tip:'天时地利，前途广阔',enTip:'Favorable timing; vast prospects'},
+  '地':{elem:4,radical:'土',structure:'左右结构（土+也）',zh:'地是厚德载物。测"地"字，主根基稳固，脚踏实地。',en:'Earth carries all with virtue. "Di" signals solid footing.',tip:'根基稳固，脚踏实地',enTip:'Solid footing; stay grounded'},
+  '人':{elem:4,radical:'人',structure:'独体字',zh:'人是天地之灵。测"人"字，主以人为本，广结善缘。',en:'Human is the spirit of heaven and earth. "Ren" signals good relationships.',tip:'以人为本，广结善缘',enTip:'People first; build good bonds'},
+  '山':{elem:4,radical:'山',structure:'独体字',zh:'山是稳重崇高。测"山"字，主稳重如山，步步高升。',en:'A mountain is steady and lofty. "Shan" signals stability and rising.',tip:'稳重如山，步步高升',enTip:'Steady as a mountain; rising step by step'},
+  '水':{elem:2,radical:'水',structure:'独体字',zh:'水是流动智慧。测"水"字，主灵活变通，财源似水。',en:'Water is flowing wisdom. "Shui" signals flexibility and flowing wealth.',tip:'灵活变通，财源似水',enTip:'Flexible; wealth flows like water'},
+  '火':{elem:3,radical:'火',structure:'独体字',zh:'火是热情能量。测"火"字，主热情似火，事业兴旺。',en:'Fire is passion and energy. "Huo" signals blazing passion.',tip:'热情似火，事业兴旺',enTip:'Blazing passion; thriving career'},
+  '日':{elem:3,radical:'日',structure:'独体字',zh:'日是光明希望。测"日"字，主如日中天，光明在前。',en:'The sun is light and hope. "Ri" signals brightness ahead.',tip:'如日中天，光明在前',enTip:'Bright ahead; peak of the sun'},
+  '月':{elem:2,radical:'月',structure:'独体字',zh:'月是阴柔美好。测"月"字，主花好月圆，柔中带刚。',en:'The moon is gentle and lovely. "Yue" signals harmony and beauty.',tip:'花好月圆，柔中带刚',enTip:'Harmony; gentle strength'},
+  '星':{elem:3,radical:'日',structure:'上下结构（日+生）',zh:'星是璀璨希望。测"星"字，主星光璀璨，前程似锦。',en:'A star is brilliance and hope. "Xing" signals a bright future.',tip:'星光璀璨，前程似锦',enTip:'Brilliant stars; bright future'},
+  '云':{elem:2,radical:'二',structure:'独体字',zh:'云是变幻自由。测"云"字，主云开见日，好运将至。',en:'Clouds are change and freedom. "Yun" signals the clouds parting for good luck.',tip:'云开见日，好运将至',enTip:'Clouds part; good luck comes'},
+  '风':{elem:1,radical:'风',structure:'半包围结构',zh:'风是流动变化。测"风"字，主乘风破浪，一帆风顺。',en:'Wind is flow and change. "Feng" signals smooth sailing.',tip:'乘风破浪，一帆风顺',enTip:'Ride the wind; smooth sailing'},
+  '雨':{elem:2,radical:'雨',structure:'独体字',zh:'雨是滋润万物。测"雨"字，主雨露滋润，福泽绵长。',en:'Rain nourishes all. "Yu" signals blessings and nourishment.',tip:'雨露滋润，福泽绵长',enTip:'Nourished; blessings endure'},
+  '雪':{elem:2,radical:'雨',structure:'上下结构（雨+彐）',zh:'雪是纯净高洁。测"雪"字，主冰清玉洁，纯净美好。',en:'Snow is pure and noble. "Xue" signals purity and beauty.',tip:'冰清玉洁，纯净美好',enTip:'Pure and noble; clean and beautiful'},
+  '花':{elem:1,radical:'艹',structure:'上下结构（艹+化）',zh:'花是绽放美好。测"花"字，主花开富贵，美好绽放。',en:'A flower blooms with beauty. "Hua" signals prosperity blossoming.',tip:'花开富贵，美好绽放',enTip:'Flowers bloom; prosperity blossoms'},
+  '春':{elem:1,radical:'日',structure:'上下结构（三+人+日）',zh:'春是万物复苏。测"春"字，主春暖花开，生机勃勃。',en:'Spring revives all. "Chun" signals renewal and vitality.',tip:'春暖花开，生机勃勃',enTip:'Spring revives; full of life'},
+  '秋':{elem:0,radical:'禾',structure:'左右结构（禾+火）',zh:'秋是收获金黄。测"秋"字，主金秋收获，硕果累累。',en:'Autumn is golden harvest. "Qiu" signals rich rewards.',tip:'金秋收获，硕果累累',enTip:'Autumn harvest; rich rewards'},
+  '明':{elem:3,radical:'日',structure:'左右结构（日+月）',zh:'日月为明。测"明"字，主光明磊落，明辨是非。',en:'Sun and moon make brightness. "Ming" signals clarity and integrity.',tip:'光明磊落，明辨是非',enTip:'Bright and clear; discern right'},
+  '光':{elem:3,radical:'儿',structure:'上下结构（⺌+兀）',zh:'光是希望照耀。测"光"字，主前途光明，光芒万丈。',en:'Light is hope shining. "Guang" signals a bright path.',tip:'前途光明，光芒万丈',enTip:'Bright path; radiant future'},
+  '大':{elem:4,radical:'大',structure:'独体字',zh:'大是宽广宏大。测"大"字，主大展宏图，大有可为。',en:'Big is broad and grand. "Da" signals great ambition.',tip:'大展宏图，大有可为',enTip:'Great ambition; vast potential'},
+  '小':{elem:1,radical:'小',structure:'独体字',zh:'小是谦逊精微。测"小"字，主积小成大，小事做起。',en:'Small is humble and subtle. "Xiao" signals that small steps build big.',tip:'积小成大，小事做起',enTip:'Small steps build big'},
+  '中':{elem:4,radical:'丨',structure:'独体字',zh:'中是中庸平衡。测"中"字，主中庸之道，不偏不倚。',en:'Middle is balance and moderation. "Zhong" signals the middle way.',tip:'中庸之道，不偏不倚',enTip:'The middle way; stay balanced'},
+  '长':{elem:1,radical:'长',structure:'独体字',zh:'长是长久成长。测"长"字，主长长久久，基业长青。',en:'Long is endurance and growth. "Chang" signals lasting success.',tip:'长长久久，基业长青',enTip:'Enduring; evergreen foundation'},
+  '东':{elem:1,radical:'木',structure:'独体字',zh:'东是日出东方。测"东"字，主紫气东来，好运东来。',en:'East is where the sun rises. "Dong" signals luck arriving from the east.',tip:'紫气东来，好运东来',enTip:'Luck from the east'},
+  '南':{elem:3,radical:'十',structure:'独体字',zh:'南是温暖繁荣。测"南"字，主南面称王，事业有成。',en:'South is warmth and prosperity. "Nan" signals achievement.',tip:'南面称王，事业有成',enTip:'Achievement; leadership'},
+  '西':{elem:0,radical:'覀',structure:'独体字',zh:'西是收获沉淀。测"西"字，主西方吉庆，秋收硕果。',en:'West is harvest and settling. "Xi" signals rewards gathered.',tip:'西方吉庆，秋收硕果',enTip:'Rewards gathered; auspicious'},
+  '北':{elem:2,radical:'匕',structure:'左右结构（丬+匕）',zh:'北是方向坚定。测"北"字，主认准方向，一路向北。',en:'North is firm direction. "Bei" signals staying your course.',tip:'认准方向，一路向北',enTip:'Stay your course; head north'},
+  '行':{elem:2,radical:'彳',structure:'左右结构（彳+亍）',zh:'行是行动前行。测"行"字，主行稳致远，行动力强。',en:'Walk is action and progress. "Xing" signals steady advancement.',tip:'行稳致远，行动力强',enTip:'Steady advancement; strong action'},
+  '开':{elem:1,radical:'廾',structure:'独体字',zh:'开是开启开拓。测"开"字，主开门大吉，开拓新局。',en:'Open is beginning and expansion. "Kai" signals opening new horizons.',tip:'开门大吉，开拓新局',enTip:'Open new horizons'},
+  '门':{elem:1,radical:'门',structure:'独体字',zh:'门是门户机遇。测"门"字，主门路广开，机会临门。',en:'A door is an opportunity. "Men" signals doors opening.',tip:'门路广开，机会临门',enTip:'Doors open; opportunities arrive'},
+  '家':{elem:4,radical:'宀',structure:'上下结构（宀+豕）',zh:'家是温暖港湾。测"家"字，主家庭和睦，家和万事兴。',en:'Home is a warm harbor. "Jia" signals family harmony.',tip:'家庭和睦，家和万事兴',enTip:'Family harmony; all prospers'},
+  '真':{elem:0,radical:'目',structure:'上下结构（十+具）',zh:'真是真诚本真。测"真"字，主真心实意，真诚待人。',en:'True is sincerity. "Zhen" signals genuine sincerity.',tip:'真心实意，真诚待人',enTip:'Genuine sincerity; treat truly'},
+  '实':{elem:4,radical:'宀',structure:'上下结构（宀+头）',zh:'实是充实务实。测"实"字，主脚踏实地，实实在在。',en:'Solid is substantial. "Shi" signals down-to-earth practicality.',tip:'脚踏实地，实实在在',enTip:'Down-to-earth; solid and real'},
+  '高':{elem:1,radical:'高',structure:'独体字',zh:'高是高尚高远。测"高"字，主步步高升，高瞻远瞩。',en:'High is noble and far. "Gao" signals rising and vision.',tip:'步步高升，高瞻远瞩',enTip:'Rising; far-sighted'},
+  '新':{elem:0,radical:'斤',structure:'左右结构（亲+斤）',zh:'新是更新焕新。测"新"字，主万象更新，新气象。',en:'New is renewal. "Xin" signals fresh beginnings.',tip:'万象更新，新气象',enTip:'Renewal; fresh beginnings'},
+  '生':{elem:1,radical:'生',structure:'独体字',zh:'生是生命生机。测"生"字，主生机勃勃，生生不息。',en:'Life is vitality. "Sheng" signals thriving vitality.',tip:'生机勃勃，生生不息',enTip:'Thriving; endless vitality'},
+  '活':{elem:2,radical:'氵',structure:'左右结构（氵+舌）',zh:'活是活力生活。测"活"字，主活水有源，活力充沛。',en:'Live is vitality. "Huo" signals energy and flow.',tip:'活水有源，活力充沛',enTip:'Flowing vitality; full energy'}
+};
+
+function buildAdvice(ch, elem, q, hasBazi, bazi){
+  // 通用的测字解读框架
+  return {zh:'', en:''};
+}
+
+// ========== 精选常用问题（20个 = 4×5 四排） ==========
+const QUICK_QUESTIONS_ZH=['事业前程','感情姻缘','财运求财','健康平安','学业考试','运势流年','人际交友','家庭和睦','抉择取舍','求职跳槽','出行远行','官司是非','子嗣孕育','寿元安康','投资理财','创业谋事','迁居置业','名誉声望','恩怨纠葛','寻物失物'];
+const QUICK_QUESTIONS_EN=['Career','Love & Marriage','Wealth','Health','Studies & Exams','Fortune','Friendship','Family','Decision','Job Change','Travel','Legal Matters','Children','Longevity','Investment','Business','Relocation','Reputation','Grudges','Lost Items'];
+const RANDOM_CHARS=['安','福','缘','路','财','梦','静','思','勇','富','乐','和','成','望','平','顺','好','康','鑫','龙','爱','信','德','善','美','喜','幸','诚','智','慧','友','情','婚','运','势','学','业','升','寿','禄','权','合','吉','祥','兴','旺','丰','盛','发','进','退','稳','快','慢','止','得','失','舍','圆','满','谦','让','心','天','地','人','山','水','火','日','月','星','云','风','雨','雪','花','春','秋','明','光','大','小','中','长','东','南','西','北','行','开','门','家','真','实','高','新','生','活'];
+
+// ========== 每日一字 / 历史 / 收藏 ==========
+let curChar='';
+let favChars=[];try{favChars=JSON.parse(localStorage.getItem('ceziFav')||'[]');}catch(e){}
+let histChars=[];try{histChars=JSON.parse(localStorage.getItem('ceziHist')||'[]');}catch(e){}
+function saveFav(){try{localStorage.setItem('ceziFav',JSON.stringify(favChars));}catch(e){}}
+function saveHist(){try{localStorage.setItem('ceziHist',JSON.stringify(histChars));}catch(e){}}
+
+// 每日一字（按日期固定）
+let dailyChar='';
+function renderDaily(){
+  const el=document.getElementById('dailyCard');
+  if(!el)return;
+  const today=new Date().toDateString();
+  let seed=0;for(let i=0;i<today.length;i++)seed+=today.charCodeAt(i);
+  dailyChar=RANDOM_CHARS[seed%RANDOM_CHARS.length];
+  const l=lang;
+  el.innerHTML=`<div style="font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">📆 ${l==='zh'?'今日吉字（点击使用）':'Today\'s character (tap to use)'}</div><div style="font-size:22px;color:var(--gold)">「${dailyChar}」</div>`;
+}
+function useDailyChar(){
+  document.getElementById('charInput').value=dailyChar;
+  showT(lang==='zh'?'已选今日吉字：'+dailyChar:'Selected: '+dailyChar);
+}
+
+// 收藏
+function toggleFavChar(){
+  const c=curChar;
+  if(!c){return;}
+  const i=favChars.indexOf(c);
+  if(i>=0){favChars.splice(i,1);showT(lang==='zh'?'已取消收藏':'Removed');}
+  else{favChars.push(c);showT(lang==='zh'?'已收藏 ★':'Favorited ★');}
+  saveFav();
+  updateFavBtn();
+}
+function updateFavBtn(){
+  const b=document.getElementById('btnToggleFav');
+  if(b){
+    const isFav=favChars.indexOf(curChar)>=0;
+    b.textContent=isFav?(lang==='zh'?'★ 已收藏':'★ Saved'):(lang==='zh'?'☆ 收藏':'☆ Save');
+  }
+  const fc=document.getElementById('favCount');
+  if(fc)fc.textContent=favChars.length;
+}
+function showFavList(){
+  const div=document.getElementById('favHistList');
+  if(favChars.length===0){showT(lang==='zh'?'收藏夹是空的':'No favorites');return;}
+  div.innerHTML=`<div style="font-size:12px;color:var(--gold);margin-bottom:6px">⭐ ${lang==='zh'?'收藏夹':'Favorites'}</div>`+favChars.map(c=>`<span class="cat-chip" style="cursor:pointer" onclick="document.getElementById('charInput').value='${c}';showT('${c}')">${c}</span>`).join('')+`<button class="btn muted sm" style="margin-top:8px" onclick="clearFav()">${lang==='zh'?'清空收藏':'Clear'}</button>`;
+}
+function clearFav(){favChars=[];saveFav();showT(lang==='zh'?'已清空':'Cleared');showFavList();updateFavBtn();}
+
+// 历史
+function addHistory(c){
+  histChars=histChars.filter(x=>x!==c);
+  histChars.unshift(c);
+  if(histChars.length>50)histChars=histChars.slice(0,50);
+  saveHist();
+}
+function showHistList(){
+  const div=document.getElementById('favHistList');
+  if(histChars.length===0){showT(lang==='zh'?'暂无历史':'No history');return;}
+  div.innerHTML=`<div style="font-size:12px;color:var(--gold);margin-bottom:6px">🕘 ${lang==='zh'?'浏览历史':'History'}</div>`+histChars.map(c=>`<span class="cat-chip" style="cursor:pointer" onclick="document.getElementById('charInput').value='${c}';showT('${c}')">${c}</span>`).join('')+`<button class="btn muted sm" style="margin-top:8px" onclick="clearHist()">${lang==='zh'?'清空历史':'Clear'}</button>`;
+}
+function clearHist(){histChars=[];saveHist();showT(lang==='zh'?'已清空':'Cleared');showHistList();}
+
+function renderQchips(){
+  const l=lang;
+  const arr=l==='zh'?QUICK_QUESTIONS_ZH:QUICK_QUESTIONS_EN;
+  const div=document.getElementById('qChips');
+  div.innerHTML=arr.map(q=>`<span class="cat-chip" style="cursor:pointer" onclick="setQuestion('${q}')" title="${l==='zh'?'点击选择':'Click to select'}">👆 ${q}</span>`).join('');
+}
+function setQuestion(q){
+  document.getElementById('question').value=q;
+  showT(lang==='zh'?'已选：'+q:'Selected: '+q);
+}
+function randomChar(){
+  const c=RANDOM_CHARS[Math.floor(Math.random()*RANDOM_CHARS.length)];
+  document.getElementById('charInput').value=c;
+  showT(lang==='zh'?'抽到：'+c:'Drawn: '+c);
+}
+function quickDivine(){
+  // 一键随机：随机字 + 随机问题，直接测
+  const c=RANDOM_CHARS[Math.floor(Math.random()*RANDOM_CHARS.length)];
+  document.getElementById('charInput').value=c;
+  const arr=lang==='zh'?QUICK_QUESTIONS_ZH:QUICK_QUESTIONS_EN;
+  document.getElementById('question').value=arr[Math.floor(Math.random()*arr.length)];
+  doDivine();
+}
+
+function doDivine(){
+  const ch=(document.getElementById('charInput').value||'').trim();
+  if(!ch){showT(lang==='zh'?'请输入一个字':'Please enter a character');return;}
+  const c=ch[0];
+  // 判断是否汉字
+  if(!/[\u4e00-\u9fa5]/.test(c)){showT(lang==='zh'?'请输入汉字':'Please enter a Chinese character');return;}
+  const q=(document.getElementById('question').value||'').trim();
+  const by=document.getElementById('by').value.trim();
+  const bm=document.getElementById('bm').value.trim();
+  const bd=document.getElementById('bd').value.trim();
+  const bh=document.getElementById('bh').value;
+  // 八字合参校验：除非四项全空，否则必须填全
+  const anyFilled=by!==''||bm!==''||bd!==''||bh!=='';
+  if(anyFilled){
+    const missing=[];
+    if(by==='')missing.push(lang==='zh'?'年份':'year');
+    if(bm==='')missing.push(lang==='zh'?'月份':'month');
+    if(bd==='')missing.push(lang==='zh'?'日期':'day');
+    if(bh==='')missing.push(lang==='zh'?'时辰':'hour');
+    if(missing.length>0){
+      showT((lang==='zh'?'八字合参请补全：':'BaZi synthesis missing: ')+missing.join('、'));
+      return;
+    }
+  }
+  const hasBazi=anyFilled;
+  // 查测字库
+  let info=CEZI[c];
+  if(!info){info=autoAnalyze(c);}
+  let elemIdx=info.elem;
+  curChar=c;
+  addHistory(c);
+  updateFavBtn();
+  document.getElementById('bigChar').textContent=c;
+  renderResult(c, info, elemIdx, q, hasBazi, {by:parseInt(by),bm:parseInt(bm),bd:parseInt(bd),bh:bh});
+  document.getElementById('inputPage').style.display='none';
+  document.getElementById('resultPage').style.display='block';
+}
+
+function detectElem(c){
+  // 通过部首检测五行
+  for(const r in RADICAL_ELEM){
+    if(c.includes(r))return RADICAL_ELEM[r];
+  }
+  // 默认土（中）
+  return 4;
+}
+
+// ========== 引经据典 · 五行经典语录库 ==========
+const ELEM_CLASSICS={
+  0:{zh:[['《周易·乾》','天行健，君子以自强不息——金主刚健，如天行不息。'],['《荀子·劝学》','锲而不舍，金石可镂——金之坚韧，贵在坚持。'],['《周易·系辞》','二人同心，其利断金——金之锋利，同心可断金。']],
+  en:[['I Ching, Qian','Heaven moves with vigor; the noble strive ceaselessly—metal is strength in motion.'],['Xunzi, On Learning','Carve without ceasing, and even metal yields—metal is endurance through persistence.'],['I Ching, Xi Ci','Two hearts as one can sever metal—metal is sharpness through unity.']]},
+  1:{zh:[['《道德经》','合抱之木，生于毫末——木之生长，起于微末。'],['《荀子·劝学》','蓬生麻中，不扶自直——木之向善，环境使然。'],['《庄子·逍遥游》','大器晚成，良木慢长——木之成材，需岁月沉淀。']],
+  en:[['Tao Te Ching','A mighty tree grows from a tiny shoot—wood grows from small beginnings.'],['Xunzi, On Learning','Hemp among hemp grows straight unaided—wood bends toward good surroundings.'],['Zhuangzi','Great vessels are late to form—wood matures through time.']]},
+  2:{zh:[['《道德经》','上善若水，水善利万物而不争——水之至善，利而不争。'],['《道德经》','天下莫柔弱于水，而攻坚强者莫之能胜——水之至柔，能克至坚。'],['《荀子·劝学》','不积小流，无以成江海——水之成势，聚于点滴。']],
+  en:[['Tao Te Ching','The highest good is like water, benefiting all without contention—water is goodness.'],['Tao Te Ching','Nothing is softer than water, yet it conquers the hardest—water’s softness overcomes.'],['Xunzi, On Learning','Without small streams, no sea—water’s power comes from accumulation.']]},
+  3:{zh:[['《周易·离》','离，丽也；日月丽乎天——火之光明，照耀四方。'],['《道德经》','飘风不终朝，骤雨不终日——火之热情，贵在持久。'],['《尚书·盘庚》','若火之燎于原，不可向迩——火之燎原，势不可挡。']],
+  en:[['I Ching, Li','Li is radiance; sun and moon light the sky—fire is illumination.'],['Tao Te Ching','A whirlwind does not last a morning—fire’s passion must endure.'],['Book of Documents','Like fire sweeping the plain, none can approach—fire’s power is unstoppable.']]},
+  4:{zh:[['《周易·坤》','地势坤，君子以厚德载物——土之厚德，承载万物。'],['《老子》','九层之台，起于累土——土之成就，积于点滴。'],['《论语》','君子务本，本立而道生——土之本分，根基为重。']],
+  en:[['I Ching, Kun','Earth’s virtue is to carry all—earth is the great bearer.'],['Laozi','A nine-story tower rises from piled earth—earth’s heights are built grain by grain.'],['The Analects','The noble attend to the root; with root, the Way grows—earth values foundations.']]}
+};
+
+// ========== 结构经典语录 ==========
+const STRUCT_CLASSICS={
+  '左右结构':{zh:'左右相扶，如《论语》"德不孤，必有邻"——结伴而行，方得助力。',en:'Left and right support each other, as "Virtue is never alone" (Analects)—walk with companions to gain strength.'},
+  '上下结构':{zh:'上下相承，如《周易》"本立而道生"——根基稳固，方能向上。',en:'Top and bottom sustain each other, as "With root, the Way grows" (I Ching)—a firm base allows rising.'},
+  '半包围结构':{zh:'半围半开，如《周易》"穷则变，变则通"——留有余地，方有转圜。',en:'Half-enclosed, as "When blocked, change; change brings flow" (I Ching)—leave room for turning.'},
+  '独体字':{zh:'独立成体，如《论语》"君子不器"——独立自主，不为一用所限。',en:'A single whole, as "The noble are not vessels" (Analects)—independent, not confined to one use.'}
+};
+
+// ========== 通用拆字解读（未收录字也适用，多角度+方案） ==========
+function autoAnalyze(c){
+  // 判断字形结构
+  let structure='独体字';
+  const L=c.length;
+  // 左右结构检测：常见偏旁
+  const leftRads=['亻','氵','讠','木','扌','钅','女','忄','纟','土','口','日','月','火','贝','石','禾','王','礻','衤','虫','足','马','鸟','饣','车','辶','酉','阝','目','矢','米','子','彳','山','彡','羊','门','忄','艹','钅','纟','讠','氵'];
+  for(const r of leftRads){
+    if(c.startsWith(r)&&c.length>1){structure='左右结构（'+r+' + '+(c.slice(1))+'）';break;}
+  }
+  // 上下结构检测
+  if(structure==='独体字'&&c.length>=2){
+    const topRads=['艹','宀','亠','冖','八','人','日','竹','雨','⺮','凵','山','口','士','彐','夕','父','禾','穴','大','小','心','灬','木','水','艹','亠','冖'];
+    for(const r of topRads){
+      if(c.startsWith(r)){structure='上下结构（'+r+' + '+(c.slice(1))+'）';break;}
+    }
+    // 下部件检测（如 灬 四点底）
+    if(structure==='独体字'){
+      const bottomRads=['灬','心','土','皿','口','日','目','木','水','火'];
+      for(const r of bottomRads){
+        if(c.endsWith(r)){structure='上下结构（'+(c.slice(0,-1))+' + '+r+'）';break;}
+      }
+    }
+  }
+  // 半包围检测
+  if(structure==='独体字'&&c.length>=2){
+    const wrapRads=['广','厂','尸','疒','辶','廴','勹','匚','门','囗','几'];
+    for(const r of wrapRads){
+      if(c.startsWith(r)||c.includes(r)){structure='半包围结构';break;}
+    }
+  }
+  const elem=detectElem(c);
+  const elemName=ELEM_NAMES[elem];
+  const elemDesc=ELEM[elemName].desc;
+  // 笔画数（用于解读）
+  const strokes=strokeCount(c);
+  // 五行能量解读
+  const elemInsight={
+    0:'金主刚毅果断。此字携金气，提示你此刻宜坚定立场、当断则断，以原则立身。',
+    1:'木主生长生机。此字携木气，提示你此刻宜耐心培育、向上生长，蓄势待发。',
+    2:'水主智慧变通。此字携水气，提示你此刻宜灵活应变、以柔克刚，遇阻则绕。',
+    3:'火主热情行动。此字携火气，提示你此刻宜积极行动、燃起热情，但勿操之过急。',
+    4:'土主稳重承载。此字携土气，提示你此刻宜脚踏实地、稳扎稳打，厚积薄发。'
+  };
+  const elemInsightEn={
+    0:'Metal rules firmness. This character carries metal energy—stand firm, decide decisively, hold your principles.',
+    1:'Wood rules growth. This character carries wood energy—nurture patiently, grow upward, gather strength.',
+    2:'Water rules wisdom. This character carries water energy—be flexible, overcome hardness with softness, flow around obstacles.',
+    3:'Fire rules action. This character carries fire energy—act positively, ignite passion, but do not rush.',
+    4:'Earth rules stability. This character carries earth energy—stay grounded, steady and solid, accumulate slowly.'
+  };
+  // 结构解读
+  const structInsight={
+    '左右结构':l=>l==='zh'?'此字左右相扶，如人结伴而行，提示你遇事可寻助力、多与人协作。':'Its left-right structure is like companions walking together—seek help and collaborate.',
+    '上下结构':l=>l==='zh'?'此字上下相承，如根基托举，提示你先把基础打牢，自下而上稳步推进。':'Its top-bottom structure is like a base supporting the top—build a solid foundation and advance upward.',
+    '半包围结构':l=>l==='zh'?'此字半围半开，如门户虚掩，提示你进退有度、留有余地，不必把话说满。':'Its half-enclosed form is like a door ajar—leave room, do not close every option.',
+    '独体字':l=>l==='zh'?'此字独立成体，一气呵成，提示你独立自主、干脆利落，少受牵绊。':'Its single-body form flows in one stroke—be independent and decisive, free of entanglements.'
+  };
+  const structKey=structure.includes('左右')?'左右结构':structure.includes('上下')?'上下结构':structure.includes('半包围')?'半包围结构':'独体字';
+  const structZh=structInsight[structKey]('zh');
+  const structEn=structInsight[structKey]('en');
+  // 行动方案（按五行给三条建议）
+  const plans={
+    0:{zh:['当断则断，犹豫会错过时机','守住原则，别为眼前小利妥协','列一个明确的计划，逐条执行'],en:['Decide decisively—hesitation misses the moment','Hold your principles over short-term gains','Make a clear plan and execute step by step']},
+    1:{zh:['给自己成长留出时间，别急于求成','深耕一项技能，向下扎根','多接触自然，让心静下来'],en:['Give yourself time to grow—no rush','Deepen one skill, put down roots','Connect with nature to calm the mind']},
+    2:{zh:['遇阻先绕行，别硬碰硬','多听多学，借力打力','保持灵活，随时调整策略'],en:['Flow around obstacles—do not fight head-on','Listen and learn, borrow strength','Stay flexible, adjust strategy anytime']},
+    3:{zh:['想好的事立刻行动，别拖','给热情设个节奏，避免三分钟热度','多与人分享，用热情感染他人'],en:['Act on what you have decided—do not delay','Set a rhythm for passion, avoid burnout','Share and inspire others with your energy']},
+    4:{zh:['脚踏实地，一步一个脚印','先稳住根基，再谈扩张','坚持比速度重要，厚积薄发'],en:['Stay grounded, one step at a time','Secure your base before expanding','Persistence beats speed—accumulate slowly']}
+  };
+  const plan=(lang==='zh'?plans[elem].zh:plans[elem].en);
+  const zh='「'+c+'」字属'+elemName+'，'+elemDesc+'。'+elemInsight[elem]+' '+(structure!=='独体字'?('字形为'+structure+'。'+structZh):structZh)+' 此字与你当下心境相应，测字贵在随缘取象，供你参考。';
+  const en='"'+c+'" belongs to the '+ELEM_NAMES_EN[elem]+' element—'+ELEM[elemName].enDesc+'. '+elemInsightEn[elem]+' '+(structure!=='独体字'?('Its structure is '+structure+'. '+structEn):structEn)+' Let it resonate with your present state of mind.';
+  const tip='随缘取象，心境相应';
+  const enTip='Read by intuition; let it resonate';
+  return {elem:elem, structure:structure, zh:zh, en:en, tip:tip, enTip:enTip, auto:true, plan:plan};
+}
+
+// 笔画数估算（简化：按 Unicode 码点与常见部首近似，仅供趣味参考）
+function strokeCount(c){
+  // 简化处理：返回字符长度作为基础，这里用 hash 近似
+  let n=0;
+  for(let i=0;i<c.length;i++){n+=c.charCodeAt(i);}
+  return (n%20)+1; // 1-20 之间近似笔画数
+}
+
+const ELEM_NAMES=['金','木','水','火','土'];
+const ELEM_NAMES_EN=['Metal','Wood','Water','Fire','Earth'];
+const ELEM_COLORS=['#FFD700','#4CAF50','#2196F3','#F44336','#FF9800'];
+const ELEM_GEN={金:'水',木:'火',水:'木',火:'土',土:'金'}; // 相生
+const ELEM_CTRL={金:'木',木:'土',水:'火',火:'金',土:'水'}; // 相克
+
+// 按五行返回行动方案（精品字也复用）
+function getPlan(elemIdx){
+  const plans={
+    0:{zh:['当断则断，犹豫会错过时机','守住原则，别为眼前小利妥协','列一个明确的计划，逐条执行'],en:['Decide decisively—hesitation misses the moment','Hold your principles over short-term gains','Make a clear plan and execute step by step']},
+    1:{zh:['给自己成长留出时间，别急于求成','深耕一项技能，向下扎根','多接触自然，让心静下来'],en:['Give yourself time to grow—no rush','Deepen one skill, put down roots','Connect with nature to calm the mind']},
+    2:{zh:['遇阻先绕行，别硬碰硬','多听多学，借力打力','保持灵活，随时调整策略'],en:['Flow around obstacles—do not fight head-on','Listen and learn, borrow strength','Stay flexible, adjust strategy anytime']},
+    3:{zh:['想好的事立刻行动，别拖','给热情设个节奏，避免三分钟热度','多与人分享，用热情感染他人'],en:['Act on what you have decided—do not delay','Set a rhythm for passion, avoid burnout','Share and inspire others with your energy']},
+    4:{zh:['脚踏实地，一步一个脚印','先稳住根基，再谈扩张','坚持比速度重要，厚积薄发'],en:['Stay grounded, one step at a time','Secure your base before expanding','Persistence beats speed—accumulate slowly']}
+  };
+  return lang==='zh'?plans[elemIdx].zh:plans[elemIdx].en;
+}
+
+function renderResult(c, info, elemIdx, q, hasBazi, bazi){
+  const l=lang;
+  const elemName=l==='zh'?ELEM_NAMES[elemIdx]:ELEM_NAMES_EN[elemIdx];
+  const elemColor=ELEM_COLORS[elemIdx];
+  const elemDesc=l==='zh'?ELEM[elemName].desc:ELEM[elemName].enDesc;
+  let html='';
+  // 五行
+  html+=`<div class="section">${l==='zh'?'🔮 五行属性':'Element'}</div>`;
+  html+=`<div class="elem-badge" style="color:${elemColor};border-color:${elemColor}">${elemName} ${l==='zh'?'· 五行':''}</div>`;
+  html+=`<div class="vernacular">${elemDesc}</div>`;
+  // 字形
+  if(info&&info.structure){
+    html+=`<div class="section">${l==='zh'?'📐 拆字':'Structure'}</div>`;
+    html+=`<div class="vernacular">${info.structure}</div>`;
+  }
+  // 字义解读
+  html+=`<div class="section">${l==='zh'?'📖 字义解读':'Interpretation'}</div>`;
+  html+=`<div class="vernacular">${l==='zh'?info?info.zh:'此字未收录，以下为五行解读。':info?info.en:'Not in the dictionary; element reading below.'}</div>`;
+  if(info&&l==='en')html+=`<div class="english">${info.en}</div>`;
+  // 引经据典（五行经典 + 结构经典）
+  html+=`<div class="section">${l==='zh'?'📜 引经据典':'Classical wisdom'}</div>`;
+  const classics=l==='zh'?ELEM_CLASSICS[elemIdx].zh:ELEM_CLASSICS[elemIdx].en;
+  classics.forEach(cc=>{
+    html+=`<div class="vernacular" style="padding:8px 10px;background:var(--inp);border-left:3px solid ${elemColor};margin:6px 0">`;
+    html+=`<div style="font-size:11px;color:var(--dim);margin-bottom:3px">${cc[0]}</div>`;
+    html+=`<div>${cc[1]}</div>`;
+    html+=`</div>`;
+  });
+  // 结构经典
+  const structKey=info&&info.structure?(info.structure.includes('左右')?'左右结构':info.structure.includes('上下')?'上下结构':info.structure.includes('半包围')?'半包围结构':'独体字'):'独体字';
+  const sc=STRUCT_CLASSICS[structKey];
+  if(sc){
+    html+=`<div class="vernacular" style="padding:8px 10px;background:var(--card);border:1px dashed var(--bdr);margin:6px 0;font-size:12px">${l==='zh'?'🔖 '+sc.zh:'🔖 '+sc.en}</div>`;
+  }
+  // 今日心法
+  if(info){
+    html+=`<div class="section">${l==='zh'?'💡 今日心法':'Heart method'}</div>`;
+    html+=`<div class="vernacular" style="color:var(--gold);text-align:center;padding:10px;border:1px solid var(--gold)">${l==='zh'?info.tip:info.enTip}</div>`;
+  }
+  // 行动方案（三条建议）
+  const plan=info&&info.plan?info.plan:getPlan(elemIdx);
+  html+=`<div class="section">${l==='zh'?'✅ 行动方案':'Action plan'}</div>`;
+  html+=plan.map((x,i)=>`<div class="vernacular" style="padding:8px 10px;background:var(--card);border:1px solid var(--bdr);margin:5px 0">${i+1}. ${x}</div>`).join('');
+  // 八字合参
+  if(hasBazi){
+    html+=`<div class="section">${l==='zh'?'⚔ 八字合参':'BaZi synthesis'}</div>`;
+    const bz=calcBazi(bazi);
+    if(bz){
+      html+=`<div class="vernacular">${l==='zh'?'您的日主：':'Your day master:'} <b>${bz.dayStem}</b>（${bz.dayElem}）</div>`;
+      const rel=eleRelation(elemIdx, bz.dayElemIdx);
+      html+=`<div class="vernacular">${rel}</div>`;
+    }else{
+      html+=`<div class="vernacular">${l==='zh'?'请填写完整的出生日期':'Please fill complete birth info'}</div>`;
+    }
+  }
+  // 问题回应
+  if(q){
+    html+=`<div class="section">${l==='zh'?'💭 你的问题':'Your question'}</div>`;
+    html+=`<div class="vernacular">${l==='zh'?'所问「'+q+'」：'+qAdvice(c,elemIdx,q):'Regarding "'+q+'": '+qAdviceEn(c,elemIdx,q)}</div>`;
+  }
+  document.getElementById('detailContent').innerHTML=html;
+}
+
+function eleRelation(charElem, dayElemIdx){
+  const l=lang;
+  const charName=l==='zh'?ELEM_NAMES[charElem]:ELEM_NAMES_EN[charElem];
+  const dayName=l==='zh'?ELEM_NAMES[dayElemIdx]:ELEM_NAMES_EN[dayElemIdx];
+  if(charElem===dayElemIdx)return l==='zh'?`测字五行「${charName}」与您日主「${dayName}」同气，气机相合，此字与您契合度高。`:`The character’s element (${charName}) matches your day master (${dayName})—strong affinity.`;
+  if(ELEM_GEN[charName]===dayName)return l==='zh'?`测字五行「${charName}」生您日主「${dayName}」，此字对您有滋养助力。`:`The character (${charName}) nourishes your day master (${dayName})—beneficial.`;
+  if(ELEM_GEN[dayName]===charName)return l==='zh'?`您日主「${dayName}」生测字五行「${charName}」，此字需您付出，宜量力而行。`:`Your day master (${dayName}) feeds the character (${charName})—it demands your effort.`;
+  if(ELEM_CTRL[charName]===dayName)return l==='zh'?`测字五行「${charName}」克您日主「${dayName}」，此字对您有挑战，宜谨慎。`:`The character (${charName}) controls your day master (${dayName})—a challenge, proceed with care.`;
+  return l==='zh'?`您日主「${dayName}」克测字五行「${charName}」，此字在您掌控之中。`:`Your day master (${dayName}) controls the character (${charName})—it is within your control.`;
+}
+
+function qAdvice(c, elem, q){
+  const good=['安','福','缘','顺','好','乐','和','康','鑫','富','成','龙','平','望'];
+  const isGood=good.includes(c);
+  return isGood?`此字为吉字，所问之事多有善果，宜坚定信心。`:`此字中性，所问之事需靠行动与智慧，事在人为。`;
+}
+function qAdviceEn(c, elem, q){
+  const good=['安','福','缘','顺','好','乐','和','康','鑫','富','成','龙','平','望'];
+  return good.includes(c)?'This is an auspicious character—your pursuit will bear good fruit; stay confident.':'This character is neutral—your pursuit depends on action and wisdom.';
+}
+
+// ========== 八字日主（简化） ==========
+function calcBazi(b){
+  // 用 lunar 库计算日主，若无则返回 null
+  try{
+    if(typeof Solar==='undefined')return null;
+    const solar=Solar.fromYmdHms(b.by,b.bm,b.bd,Number(b.bh)*2,0,0);
+    const lunar=solar.getLunar();
+    const dayGZ=lunar.getDayInGanZhi(); // 日柱
+    const dayStem=dayGZ[0];
+    const STEMS='甲乙丙丁戊己庚辛壬癸';
+    const ELEMS=['木','木','火','火','土','土','金','金','水','水'];
+    const idx=STEMS.indexOf(dayStem);
+    return {dayStem:dayStem, dayElem:ELEMS[idx], dayElemIdx:ELEM_NAMES.indexOf(ELEMS[idx])};
+  }catch(e){return null;}
+}
+
+// ========== THEME ==========
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('btnTheme');if(b)b.textContent=t==='light'?'🌙':'☀️';}
+function toggleTheme(){const cur=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';applyTheme(cur);try{localStorage.setItem('ceziTheme',cur);}catch(e){}}
+(function(){try{applyTheme(localStorage.getItem('ceziTheme')||'light');}catch(e){applyTheme('light');}})();
+
+// ========== LANGUAGE ==========
+function setL(l){
+  lang=l;
+  document.getElementById('btnZh').className=l==='zh'?'active':'';
+  document.getElementById('btnEn').className=l==='en'?'active':'';
+  document.getElementById('lblChar').textContent=l==='zh'?'✍️ 输入一个字（或随机抽字）':'✍️ Enter a character (or draw random)';
+  document.getElementById('lblQuestion').textContent=l==='zh'?'💭 你想问什么？（选一个或自己填）':'💭 What do you ask? (pick or type)';
+  document.getElementById('lblBazi').textContent=l==='zh'?'⚔ 加入八字合参（选填 · 填则需填全）':'⚔ Add BaZi synthesis (optional, fill all)';
+  document.getElementById('charInput').placeholder=l==='zh'?'如：安、福、缘、路...':'e.g. 安 peace, 福 fortune...';
+  document.getElementById('question').placeholder=l==='zh'?'如：事业、感情、运势...':'e.g. career, love, fortune...';
+  document.getElementById('btnDivine').textContent=l==='zh'?'🔮 测字':'🔮 Divine';
+  document.getElementById('btnRandChar').textContent=l==='zh'?'🎲 随机':'🎲 Random';
+  document.getElementById('btnQuick').textContent=l==='zh'?'🎲 一键随机测字':'🎲 Quick random divine';
+  document.getElementById('remark').textContent=l==='zh'?'心诚则灵 · 一字一问 · 仅供文化参考':'One character, one question · Cultural reference only';
+  document.getElementById('lblBack').textContent=l==='zh'?'返回重测':'Back';
+  document.getElementById('btnCopy').textContent=l==='zh'?'复制':'Copy';
+  document.getElementById('btnDl').textContent=l==='zh'?'下载图':'Image';
+  document.getElementById('footText').textContent=l==='zh'?'© 测字问心 · 永远的兰兰 · 参考传统测字文化 · 仅供文化参考':'© ZiOracle · Lanlan Eternal · Traditional culture reference only';
+  // 年月日时辰英文
+  document.getElementById('by').placeholder=l==='zh'?'年':'Year';
+  document.getElementById('bm').placeholder=l==='zh'?'月':'Mon';
+  document.getElementById('bd').placeholder=l==='zh'?'日':'Day';
+  const HOUR_ZH=['子时 23-1','丑时 1-3','寅时 3-5','卯时 5-7','辰时 7-9','巳时 9-11','午时 11-13','未时 13-15','申时 15-17','酉时 17-19','戌时 19-21','亥时 21-23'];
+  const HOUR_EN=['Zi 23-1','Chou 1-3','Yin 3-5','Mao 5-7','Chen 7-9','Si 9-11','Wu 11-13','Wei 13-15','Shen 15-17','You 17-19','Xu 19-21','Hai 21-23'];
+  const bhSel=document.getElementById('bh');
+  const bhOpts=bhSel.options;
+  bhOpts[0].textContent=l==='zh'?'时辰（选）':'Hour (pick)';
+  for(let i=1;i<bhOpts.length;i++){bhOpts[i].textContent=l==='zh'?HOUR_ZH[i-1]:HOUR_EN[i-1];}
+  renderQchips();
+  document.getElementById('btnFav').textContent=l==='zh'?'收藏夹':'Favorites';
+  document.getElementById('btnHist').textContent=l==='zh'?'历史':'History';
+  renderDaily();
+  updateFavBtn();
+  ['tGuide','tDisclaim','tAbout'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=l==='zh'?{tGuide:'使用说明',tDisclaim:'免责声明',tAbout:'关于'}[id]:{tGuide:'Guide',tDisclaim:'Disclaimer',tAbout:'About'}[id];});
+  if(document.getElementById('resultPage').style.display==='block'){
+    // 重新渲染当前结果
+    const c=document.getElementById('bigChar').textContent;
+    if(c&&CEZI[c]){const info=CEZI[c];renderResult(c,info,info.elem,document.getElementById('question').value,false,null);}
+  }
+}
+
+// ========== HELP MODALS ==========
+function openM(type){
+  const l=lang;
+  const c={
+    guide:l==='zh'?`<h2>📖 使用说明</h2>
+<p><b>测字问心 · 三种用法，随心选择</b></p>
+<p><b>第一步 · 选字</b><br>
+① <b>自己输入</b>：在测字框输入一个汉字（如"安""福""缘"）；<br>
+② <b>随机抽字</b>：点测字框旁的"🎲 随机"，从常用字库抽一个；<br>
+③ <b>一键随机</b>：点底部"🎲 一键随机测字"，字和问题都自动生成，完全不用打字。</p>
+<p><b>第二步 · 问事（选填）</b><br>
+点上方 <b>👆 问题标签</b>（事业/感情/财运等 14 个精选问题）即可直接选用，也可自行输入。选了问题，解读会更贴合你的处境。</p>
+<p><b>第三步 · 八字合参（选填）</b><br>
+填入公历出生年月日 + 时辰，系统会结合你的八字日主五行做交叉解读。<b>注意：此项一旦填写需填全</b>（年月日时辰缺一不可），否则会提示补全；完全不想填则跳过。</p>
+<p><b>解读内容</b><br>
+每条测字包含：五行属性 / 拆字结构 / 字义解读 / 今日心法 / 行动方案 / （可选）八字合参。</p>
+<p><b>其他功能</b><br>
+菜单栏可切换<b>中英双语</b>与<b>亮暗主题</b>；结果页"📋 复制""🖼️ 下载图"可分享。</p>`:`<h2>📖 Guide</h2>
+<p><b>ZiOracle — three ways, your choice</b></p>
+<p><b>Step 1 · Choose a character</b><br>
+① <b>Type</b> a Chinese character (e.g. 安, 福, 缘);<br>
+② <b>Random</b>: tap "🎲 Random" to draw one from the library;<br>
+③ <b>Quick divine</b>: tap "🎲 Quick random divine" — character and question are auto-generated, zero typing.</p>
+<p><b>Step 2 · Ask (optional)</b><br>
+Tap a <b>👆 question tag</b> (Career, Love, Wealth... 14 preset questions) or type your own. A question makes the reading more relevant.</p>
+<p><b>Step 3 · BaZi synthesis (optional)</b><br>
+Enter Gregorian birth date + hour to cross-read with your day master. <b>Note: if filled, all four fields are required</b> — missing any will prompt you; skip entirely if you prefer.</p>
+<p><b>Reading includes</b>: element / structure / interpretation / heart method / action plan / (optional) BaZi synthesis.</p>
+<p><b>More</b>: toggle <b>Chinese/English</b> and <b>light/dark themes</b>; "📋 Copy" and "🖼️ Image" to share.</p>`,
+    disclaim:l==='zh'?`<h2>⚠️ 免责声明</h2>
+<p><b>1. 性质说明</b><br>
+本工具基于中国传统测字（拆字）文化制作，全部内容属<b>文化研究与娱乐</b>范畴，并非科学预测、命理断言、心理咨询或任何专业服务。</p>
+<p><b>2. 解读的主观性</b><br>
+拆字、五行归类、字义解读均为编者基于字形字义与民间测字传统的主观阐释，不同流派理解可能不同，不代表任何权威定论。</p>
+<p><b>3. 不提供专业建议</b><br>
+本工具不提供医疗、法律、金融、心理治疗等专业建议。"行动方案"为通用生活参考，不能替代专业诊断与治疗。若您正经历严重情绪困扰或健康问题，请及时联系专业人士。</p>
+<p><b>4. 决策责任</b><br>
+请勿将测字结果作为重大人生决策（婚姻、投资、职业、医疗）的唯一依据。测字是一面镜子，照见的是您此刻的心境，人生的路仍要靠自己走。</p>
+<p><b>5. 数据与隐私</b><br>
+本工具为纯前端单文件应用，无服务器、无第三方跟踪。所有数据仅保存在本地浏览器，不会上传；清除浏览器数据即可彻底删除。</p>
+<p><b>6. 知识产权</b><br>
+本工具代码以开源形式发布，仅限个人学习与娱乐使用，请勿用于商业牟利。</p>
+<p>继续使用即表示您已阅读、理解并同意以上全部条款。</p>`:`<h2>⚠️ Disclaimer</h2>
+<p><b>1. Nature:</b> Built upon traditional Chinese CeZi/ZiOracle (character divination) culture, all content is for <b>cultural study and entertainment</b>. It is not scientific prediction, fate assertion, therapy, or any professional service.</p>
+<p><b>2. Subjectivity:</b> Character deconstruction, element classification, and interpretations are subjective editorial work based on glyphs, meanings, and folk tradition. Different schools may differ; none is authoritative.</p>
+<p><b>3. No professional advice:</b> This tool offers no medical, legal, financial, or therapeutic advice. Action plans are general references only. Seek professionals if in serious distress.</p>
+<p><b>4. Decision responsibility:</b> Never use results as the sole basis for major decisions (marriage, investment, career, medical). ZiOracle is a mirror reflecting your current state of mind—your path is still yours to walk.</p>
+<p><b>5. Data &amp; privacy:</b> Pure front-end single-file app. No server, no tracking. Data stays in your browser only; clearing it removes everything.</p>
+<p><b>6. Intellectual property:</b> Open-sourced for personal study and entertainment. Commercial misuse is prohibited.</p>
+<p>By using this tool you accept all terms above.</p>`,
+    about:l==='zh'?`<h2>ℹ️ 关于本工具</h2>
+<p><b>测字问心 · ZiOracle</b> — "一字一世界，一字一心境。"</p>
+<p>测字（拆字）是中国古老的文字占卜法：通过拆解一个汉字的字形、部首、笔画，分析其五行属性，从而解读寓意。测字问心将其数字化，让古老的文字智慧在现代依然可以为你提供一份文化视角的参考。</p>
+<p><b>核心特色</b></p>
+<ul>
+<li>✍️ <b>三种用法</b> — 输入 / 随机抽字 / 一键随机，不输入也能测</li>
+<li>📐 <b>拆字解字</b> — 自动识别字形结构（左右/上下/半包围/独体）</li>
+<li>🔮 <b>五行分析</b> — 200+ 部首五行库，覆盖所有常用字</li>
+<li>💭 <b>14 个精选问题</b> — 事业/感情/财运/健康等一键选用</li>
+<li>✅ <b>行动方案</b> — 每条附三条具体建议</li>
+<li>⚔ <b>八字合参</b> — 结合日主五行交叉解读</li>
+<li>🖼️ <b>卡片下载</b> — PNG 卡片一键发圈</li>
+<li>🌐 <b>中英双语</b> — 全站一键切换</li>
+<li>🌙 <b>亮暗主题</b> — 自动记忆偏好</li>
+</ul>
+<p><b>技术说明</b><br>
+纯前端单文件 HTML/CSS/JS，无后端、无依赖、无数据上传，浏览器打开即用，可离线保存本地使用。</p>
+<p><b>作者：</b>永远的兰兰 (Lanlan Eternal)</p>
+<p><b>开源地址：</b><a href="https://github.com/podcatcher962" target="_blank" style="color:var(--accent)">github.com/podcatcher962</a></p>
+<p style="margin-top:10px;color:var(--dim);font-size:10px">© 永远的兰兰 · Lanlan Eternal · 2026 · 仅供文化参考</p>`:`<h2>ℹ️ About</h2>
+<p><b>ZiOracle</b> — "One character, one world; one character, one heart."</p>
+<p>CeZi (character divination, known here as ZiOracle) is an ancient Chinese method: by deconstructing a character’s form, radical, and strokes, and analyzing its five-element attribute, one reads its meaning. This tool digitizes it, offering a cultural perspective for modern life.</p>
+<p><b>Highlights</b></p>
+<ul>
+<li>✍️ <b>Three modes</b> — type / random draw / quick random</li>
+<li>📐 <b>Structure analysis</b> — auto-detect left-right, top-bottom, enclosure, single-body</li>
+<li>🔮 <b>Five elements</b> — 200+ radical library covering all common characters</li>
+<li>💭 <b>14 preset questions</b> — Career, Love, Wealth, Health, etc.</li>
+<li>✅ <b>Action plan</b> — three concrete suggestions per reading</li>
+<li>⚔ <b>BaZi synthesis</b> — cross-read with your day master</li>
+<li>🖼️ <b>Card download</b> — PNG to share</li>
+<li>🌐 <b>Bilingual</b> — full Chinese/English toggle</li>
+<li>🌙 <b>Light/dark themes</b> — remembers preference</li>
+</ul>
+<p><b>Tech:</b> Single-file front-end HTML/CSS/JS. No backend, no tracking, no upload. Works offline.</p>
+<p><b>Author:</b> Lanlan Eternal (永远的兰兰)</p>
+<p><b>Source:</b> <a href="https://github.com/podcatcher962" target="_blank" style="color:var(--accent)">github.com/podcatcher962</a></p>
+<p style="margin-top:10px;color:var(--dim);font-size:10px">© Lanlan Eternal · 2026 · For cultural reference only</p>`
+  };
+  document.getElementById('modalBox').innerHTML=`<button class="modal-close" onclick="closeM()">✕</button>${c[type]||''}`;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeM(){document.getElementById('modalOverlay').classList.remove('show');}
+function showT(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tid);t._tid=setTimeout(()=>t.classList.remove('show'),2200);}
+
+function backToInput(){
+  document.getElementById('inputPage').style.display='block';
+  document.getElementById('resultPage').style.display='none';
+}
+
+function copyCard(){
+  const c=document.getElementById('bigChar').textContent;
+  if(!c)return;
+  const info=CEZI[c];
+  const text=info?`【测字：${c}】\n拆字：${info.structure}\n五行：${ELEM_NAMES[info.elem]}\n解读：${info.zh}\n今日心法：${info.tip}\n——测字问心 ZiOracle`:`【测字：${c}】\n五行：${ELEM_NAMES[detectElem(c)]}\n——测字问心 ZiOracle`;
+  navigator.clipboard.writeText(text).then(()=>showT(lang==='zh'?'已复制':'Copied')).catch(()=>showT(lang==='zh'?'复制失败':'Copy failed'));
+}
+
+function downloadCard(){
+  const ch=document.getElementById('bigChar').textContent;
+  if(!ch)return;
+  const info=CEZI[ch];
+  const elem=info?info.elem:detectElem(ch);
+  const l=lang;
+  const W=500,H=700;
+  const cv=document.getElementById('cv');
+  cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  // 五行色背景（金=金黄，木=绿，水=蓝，火=红，土=橙）
+  const elemBg=[['#2a2410','#1a1406'],['#0f2016','#07130c'],['#0a1a2a','#050d17'],['#2a0f0a','#1a0805'],['#241a08','#140f04']];
+  const grad=c.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,elemBg[elem][0]);grad.addColorStop(1,elemBg[elem][1]);
+  c.fillStyle=grad;c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(255,255,255,0.08)';c.lineWidth=1;
+  for(let x=0;x<W;x+=30){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=0;y<H;y+=30){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  const elemColor=ELEM_COLORS[elem];
+  c.strokeStyle=elemColor;c.lineWidth=3;c.strokeRect(12,12,W-24,H-24);
+  c.strokeStyle=elemColor;c.globalAlpha=0.4;c.strokeRect(22,22,W-44,H-44);c.globalAlpha=1;
+  c.fillStyle='#ffd700';c.font='bold 24px "Microsoft YaHei",sans-serif';c.textAlign='center';
+  c.fillText('测 字 问 心 · ZiOracle',W/2,60);
+  c.fillStyle='rgba(255,255,255,0.6)';c.font='13px "Microsoft YaHei",sans-serif';
+  c.fillText('One Character, One World',W/2,85);
+  c.strokeStyle=elemColor;c.globalAlpha=0.5;
+  c.beginPath();c.moveTo(60,102);c.lineTo(W-60,102);c.stroke();c.globalAlpha=1;
+  // 大字
+  c.fillStyle=elemColor;c.font='bold 120px "KaiTi","STKaiti",serif';
+  c.fillText(ch,W/2,235);
+  // 五行
+  const en=ELEM_NAMES[elem];
+  c.fillStyle=ELEM_COLORS[elem];
+  c.font='bold 22px "Microsoft YaHei",sans-serif';
+  c.fillText(l==='zh'?'五行 · '+en:'Element · '+ELEM_NAMES_EN[elem],W/2,285);
+  // 拆字
+  let y=330;
+  if(info){
+    c.fillStyle='#c8d6e5';c.font='15px "Microsoft YaHei",sans-serif';c.textAlign='center';
+    y=wrapText(c,info.structure,W/2,y,W-120,24);
+    y+=10;
+    c.fillStyle='#c8d6e5';c.font='16px "Microsoft YaHei",sans-serif';c.textAlign='left';
+    y=wrapText(c,l==='zh'?info.zh:info.en,60,y+16,W-120,26);
+    y+=24;
+    // 心法框
+    c.fillStyle='rgba(255,215,0,0.08)';c.fillRect(50,y,400,80);
+    c.strokeStyle='rgba(255,215,0,0.3)';c.strokeRect(50,y,400,80);
+    c.fillStyle='#ffd700';c.font='bold 17px "Microsoft YaHei",sans-serif';c.textAlign='center';
+    c.fillText('💡 '+(l==='zh'?'今日心法':'HEART METHOD'),W/2,y+30);
+    c.font='14px "Microsoft YaHei",sans-serif';
+    wrapText(c,l==='zh'?info.tip:info.enTip,W/2,y+56,W-130,22);
+  }
+  c.textAlign='center';c.fillStyle='#576574';c.font='12px "Microsoft YaHei",sans-serif';
+  c.fillText('© 永远的兰兰 · Lanlan Eternal · 测字问心 ZiOracle · 仅供文化参考',W/2,H-25);
+  try{
+    const a=document.createElement('a');
+    a.href=cv.toDataURL('image/png');
+    a.download='ZiOracle_'+ch+'.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showT(lang==='zh'?'🖼️ 卡片已下载':'Image downloaded');
+  }catch(e){showT(lang==='zh'?'下载失败':'Download failed');}
+}
+function wrapText(c,text,x,y,maxW,lineH){
+  const chars=String(text).split('');
+  let line='',yy=y;
+  for(let i=0;i<chars.length;i++){
+    line+=chars[i];
+    if(c.measureText(line).width>maxW){
+      c.fillText(line.slice(0,-1),x,yy);
+      line=chars[i];yy+=lineH;
+    }
+  }
+  if(line)c.fillText(line,x,yy);
+  return yy+lineH;
+}
+
+// init
+renderQchips();
+renderDaily();
+updateFavBtn();
+</script>
+</body>
+</html>
