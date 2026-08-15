@@ -46,10 +46,15 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(74,1
 .modal-close{position:absolute;top:10px;right:16px;color:var(--dim);font-size:22px;cursor:pointer;background:none;border:none;font-family:inherit}
 .foot{margin-top:24px;color:var(--foot);font-size:12px;text-align:center}.foot a{color:var(--accent);text-decoration:none}
 @media(max-width:480px){.card{padding:14px 16px 18px}.hdr h1{font-size:20px}.bigchar{font-size:64px}}
+/* 开屏海报 */
+#splash{position:fixed;inset:0;z-index:300;background:#f2e6cd url('generated-images/ZiOracle_poster_final.jpg') center/contain no-repeat;animation:splashFade 9s ease forwards;}
+@keyframes splashFade{0%{opacity:0}8%{opacity:1}70%{opacity:1}100%{opacity:0;visibility:hidden}}
 </style>
 <script>document.documentElement.setAttribute('data-theme',(function(){try{return localStorage.getItem('ceziTheme')||'light'}catch(e){return'light'}})());</script>
 </head>
 <body>
+<div id="splash"></div>
+<audio id="bgm" loop src="audio/zioracle.mp3"></audio>
 
 <div class="hdr">
 <h1>测字问心 · ZiOracle</h1>
@@ -63,7 +68,8 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(74,1
 <span style="color:var(--bdr)">|</span>
 <a id="btnZh" class="active" onclick="setL('zh')">中</a>
 <a id="btnEn" onclick="setL('en')">EN</a>
-<a id="btnTheme" onclick="toggleTheme()" style="font-size:13px">🌙</a>
+<a id="btnTheme" onclick="toggleTheme()" style="font-size:13px"><span id="themeIcon">🌙</span> <span id="tTheme">主题</span></a>
+<a id="btnSound" onclick="toggleSound()" title="背景音乐">♪ <span id="tSound">音乐</span></a>
 </div>
 
 <div class="card" id="inputPage">
@@ -615,15 +621,37 @@ function calcBazi(b){
 }
 
 // ========== THEME ==========
-function applyTheme(t){document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('btnTheme');if(b)b.textContent=t==='light'?'🌙':'☀️';}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);const b=document.getElementById('themeIcon');if(b)b.textContent=t==='light'?'🌙':'☀️';}
 function toggleTheme(){const cur=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';applyTheme(cur);try{localStorage.setItem('ceziTheme',cur);}catch(e){}}
 (function(){try{applyTheme(localStorage.getItem('ceziTheme')||'light');}catch(e){applyTheme('light');}})();
+
+// ========== 背景音乐（默认播放） ==========
+let soundOn = true;
+function toggleSound(){
+  soundOn = !soundOn;
+  const bgm = document.getElementById('bgm');
+  if(soundOn){ bgm.play().catch(()=>{}); }
+  else { bgm.pause(); }
+  document.getElementById('btnSound').className = soundOn ? 'active' : '';
+}
+(function(){
+  const bgm = document.getElementById('bgm');
+  if(!bgm) return;
+  bgm.volume = 0.35;
+  bgm.play().catch(()=>{});
+  document.getElementById('btnSound').className = 'active';
+  document.addEventListener('pointerdown', function(){
+    if(soundOn && bgm.paused) bgm.play().catch(()=>{});
+  });
+})();
 
 // ========== LANGUAGE ==========
 function setL(l){
   lang=l;
   document.getElementById('btnZh').className=l==='zh'?'active':'';
   document.getElementById('btnEn').className=l==='en'?'active':'';
+  document.getElementById('tTheme').textContent=l==='zh'?'主题':'Theme';
+  document.getElementById('tSound').textContent=l==='zh'?'音乐':'Music';
   document.getElementById('lblChar').textContent=l==='zh'?'✍️ 输入一个字（或随机抽字）':'✍️ Enter a character (or draw random)';
   document.getElementById('lblQuestion').textContent=l==='zh'?'💭 你想问什么？（选一个或自己填）':'💭 What do you ask? (pick or type)';
   document.getElementById('lblBazi').textContent=l==='zh'?'⚔ 加入八字合参（选填 · 填则需填全）':'⚔ Add BaZi synthesis (optional, fill all)';
