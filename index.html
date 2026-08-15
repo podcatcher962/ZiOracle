@@ -637,7 +637,7 @@ function toggleSound(){
 (function(){
   const bgm = document.getElementById('bgm');
   if(!bgm) return;
-  bgm.volume = 0.35;
+  bgm.volume = 0.25;
   bgm.play().catch(()=>{});
   document.getElementById('btnSound').className = 'active';
   document.addEventListener('pointerdown', function(){
