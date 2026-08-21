@@ -49,6 +49,10 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(74,1
 /* 开屏海报 */
 #splash{position:fixed;inset:0;z-index:300;background:#f2e6cd url('generated-images/ZiOracle_poster_final.jpg') center/contain no-repeat;animation:splashFade 9s ease forwards;}
 @keyframes splashFade{0%{opacity:0}8%{opacity:1}70%{opacity:1}100%{opacity:0;visibility:hidden}}
+
+/* 白天主按钮修复：金棕渐变+深棕字（暗色保持深蓝+金） */
+html[data-theme="light"] .btn:not(.muted):not(.sm){background:linear-gradient(180deg,#c9a25a,#a37c34);color:#33230c;text-shadow:none}
+html[data-theme="light"] .btn:not(.muted):not(.sm):hover{background:linear-gradient(180deg,#d4b26a,#b18a40);border-color:var(--accent)}
 </style>
 <script>document.documentElement.setAttribute('data-theme',(function(){try{return localStorage.getItem('ceziTheme')||'light'}catch(e){return'light'}})());</script>
 </head>
